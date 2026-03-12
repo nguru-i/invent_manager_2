@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Create Loan</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Loan</button>
+    </form>
+    <a href="{% url 'loan_list' %}">Back to loans</a>
+</body>
+</html>

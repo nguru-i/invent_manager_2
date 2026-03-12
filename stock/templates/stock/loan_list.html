@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Loan List</h1>
+    <ul>
+        {% for loan in loans %}
+            <li>{{ loan.product.name }} - {{ loan.customer.name }} - Status: {{ loan.status }} - Due Date: {{ loan.due_back_date }}</li>
+        {% empty %}
+            <li>No loans found</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

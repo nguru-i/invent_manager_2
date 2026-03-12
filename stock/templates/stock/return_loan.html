@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Return Loan</h1>
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+    <p>Product: {{ loan.product.name }}</p>
+    <p>Customer: {{ loan.customer.name }}</p>
+    <p>Status: {{ loan.status }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirm Return</button>
+    </form>
+    <a href="{% url 'loan_list' %}">Cancel</a>
+</body>
+</html>

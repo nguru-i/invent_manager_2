@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Dashboard</h1>
+    <p>Total Products: {{ total_products }}</p>
+    <p>Total Customers: {{ total_customers }}</p>
+    <p>Active Loans: {{ active_loans }}</p>
+    <h3>Low Stock Products</h3>
+    <ul>
+        {% for product in low_stock %}
+            <li>{{ product.name }} - {{ product.quantity }} remaining</li>
+        {% empty %}
+            <li>No low stock items</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
