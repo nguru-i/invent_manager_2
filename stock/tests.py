@@ -1,6 +1,7 @@
 import pytest
 from django.utils import timezone
 from django.test.utils import override_settings
+from django.contrib.auth.models import User
 from datetime import timedelta
 from django.test import Client
 from django.urls import reverse
@@ -90,26 +91,34 @@ def test_loan_str():
 
 @pytest.mark.django_db
 def test_dashboard_returns_200():
+    user = User.objects.create_user(username='testuser', password='testpass')
     client = Client()
+    client.force_login(user)
     response = client.get(reverse('dashboard'))
     assert response.status_code == 200
 
 @pytest.mark.django_db
 def test_loan_list_returns_200():
+    user = User.objects.create_user(username='testuser', password='testpass')
     client = Client()
+    client.force_login(user)
     response = client.get(reverse('loan_list'))
     assert response.status_code == 200
 
 @pytest.mark.django_db
 def test_create_loan_view_get_returns_200 ():
+    user = User.objects.create_user(username='testuser', password='testpass')
     client = Client()
+    client.force_login(user)
     response = client.get(reverse('create_loan'))
     assert response.status_code == 200
 
 
 @pytest.mark.django_db 
 def test_create_loan_view_post_success():
+    user = User.objects.create_user(username='testuser', password='testpass')
     client = Client()
+    client.force_login(user)  # Log in the user to access the view
     customer = Customer.objects.create(name="Test User", phone="+447111111111", email="test@test.com")
     product = Product.objects.create(name="Test Product", price=10.00, category="Other", quantity=5)
     due_back_date = (timezone.now() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%M')
@@ -124,7 +133,9 @@ def test_create_loan_view_post_success():
 
 @pytest.mark.django_db
 def test_create_loan_view_post_out_of_stock ():
+    user = User.objects.create_user(username='testuser', password='testpass')
     client = Client()
+    client.force_login(user)  # Log in the user to access the view
     customer = Customer.objects.create(name="Test User", phone="+447111111111", email="test@test.com")
     product = Product.objects.create(name="Test Product", price=10.00, category="Other", quantity=0)
     due_back_date = (timezone.now() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%M')
@@ -140,7 +151,9 @@ def test_create_loan_view_post_out_of_stock ():
 
 @pytest.mark.django_db
 def test_return_loan_view_post_success():
+    user = User.objects.create_user(username='testuser', password='testpass')
     client = Client()
+    client.force_login(user)
     customer = Customer.objects.create(name="Test User", phone="+447111111111", email="test@test.com")
     product = Product.objects.create(name="Test Product", price=10.00, category="Other", quantity=5)
     due_back_date = (timezone.now() + timedelta(days=7))
@@ -154,7 +167,9 @@ def test_return_loan_view_post_success():
 
 @pytest.mark.django_db
 def test_return_loan_view_already_returned():
+    user = User.objects.create_user(username='testuser', password='testpass')
     client = Client()
+    client.force_login(user)  # Log in the user to access the view
     customer = Customer.objects.create(name="Test User", phone="+447111111111", email="test@test.com")
     product = Product.objects.create(name="Test Product", price=10.00, category="Other", quantity=5)
     due_back_date = (timezone.now() + timedelta(days=7))
@@ -169,7 +184,9 @@ def test_return_loan_view_already_returned():
 
 @pytest.mark.django_db
 def test_return_loan_view_get_returns_200 ():
+    user = User.objects.create_user(username='testuser', password='testpass')
     client = Client()
+    client.force_login(user)  # Log in the user to access the view
     customer = Customer.objects.create(name="Test User", phone="+447111111111", email="test@test.com")
     product = Product.objects.create(name="Test Product", price=10.00, category="Other", quantity=5)
     due_back_date = (timezone.now() + timedelta(days=7))
@@ -185,6 +202,7 @@ def test_return_loan_view_get_returns_200 ():
 @pytest.mark.django_db
 def test_loan_list_query_count():
     #Arrange --create 3 loans
+    user = User.objects.create_user(username='testuser', password='testpass')
     customer = Customer.objects.create(name="Test User", phone="+447111111111", email="test@test.com")
     product = Product.objects.create(name="Test Product", price=10.00, category="Other", quantity=5)
     due_back_date = (timezone.now() + timedelta(days=7))
@@ -194,11 +212,12 @@ def test_loan_list_query_count():
 
     #Act -- reset query log, hit the view
     client = Client()
+    client.force_login(user)  # Log in the user to access the view
     connection.queries_log.clear()
     with override_settings(DEBUG=True):
         response = client.get(reverse('loan_list'))
         query_count = len(connection.queries)
 
-    #Assert -- should only be 1 query, not 7 (1 for loans, 3 for customers, 3 for products)
+    #Assert -- # 1 loan query + session/auth queries
     assert response.status_code == 200
-    assert query_count == 1
+    assert query_count <= 4

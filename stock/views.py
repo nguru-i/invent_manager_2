@@ -1,9 +1,12 @@
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Customer, Product, Loan
 from .forms import LoanForm
 from .services import create_loan, return_loan
 
+
+@login_required
 def dashboard(request):
     """Display the main dashboard with summary statistics."""
     total_products = Product.objects.count()
@@ -20,6 +23,7 @@ def dashboard(request):
 
     return render(request, 'stock/dashboard.html', context)
 
+@login_required
 def loan_list(request):
     """Display all loans."""
     loans = Loan.objects.select_related('customer', 'product').all()
@@ -27,7 +31,7 @@ def loan_list(request):
     context = {'loans': loans}
     return render(request, 'stock/loan_list.html', context)
 
-
+@login_required
 def create_loan_view(request):
     """Handle the creation of a new loan."""
     if request.method == 'POST':
@@ -49,7 +53,7 @@ def create_loan_view(request):
 
     return render(request, 'stock/create_loan.html', {'form': form})
 
-
+@login_required
 def return_loan_view(request, pk):
      """Handle the return of a loaned product."""
      loan = get_object_or_404(Loan, pk=pk)
