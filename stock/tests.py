@@ -261,3 +261,26 @@ def test_export_loans_excel():
     assert response.status_code == 200
     assert response['Content-Type'] == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     assert 'loans.xlsx' in response['Content-Disposition']
+
+
+@pytest.mark.django_db
+def test_loan_list_pagination():
+    # Arrange — create 6 loans (more than the 5 per page limit)
+    user = User.objects.create_user(username='testuser', password='testpass')
+    customer = Customer.objects.create(name="Test User", phone="+447111111111", email="test@test.com")
+    product = Product.objects.create(name="Test Product", price=10.00, category="Other", quantity=10)
+    due_back_date = timezone.now() + timedelta(days=7)
+    for _ in range(6):
+        create_loan(customer, product, due_back_date)
+
+    # Act
+    client = Client()
+    client.force_login(user)
+    response = client.get(reverse('loan_list'))
+
+    # Assert — page 1 should have 5 loans, not 6
+    assert response.status_code == 200
+    assert len(response.context['loans']) == 5
+    assert response.context['page_obj'].paginator.num_pages == 2
+
+
