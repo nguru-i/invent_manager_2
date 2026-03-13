@@ -1,17 +1,27 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <h1>Return Loan</h1>
-    {% if error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
-    <p>Product: {{ loan.product.name }}</p>
-    <p>Customer: {{ loan.customer.name }}</p>
-    <p>Status: {{ loan.status }}</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Confirm Return</button>
-    </form>
-    <a href="{% url 'loan_list' %}">Cancel</a>
-</body>
-</html>
+{% extends 'stock/base.html' %}
+
+{% block title %}Return Loan{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1 class="mb-4">Return Loan</h1>
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <p><strong>Product:</strong> {{ loan.product.name }}</p>
+                <p><strong>Customer:</strong> {{ loan.customer.name }}</p>
+                <p><strong>Status:</strong> {{ loan.status }}</p>
+                <p><strong>Due Back:</strong> {{ loan.due_back_date|date:"d M Y" }}</p>
+            </div>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning">Confirm Return</button>
+            <a href="{% url 'loan_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

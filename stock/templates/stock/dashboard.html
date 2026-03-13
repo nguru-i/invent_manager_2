@@ -1,17 +1,43 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <h1>Dashboard</h1>
-    <p>Total Products: {{ total_products }}</p>
-    <p>Total Customers: {{ total_customers }}</p>
-    <p>Active Loans: {{ active_loans }}</p>
-    <h3>Low Stock Products</h3>
-    <ul>
-        {% for product in low_stock %}
-            <li>{{ product.name }} - {{ product.quantity }} remaining</li>
-        {% empty %}
-            <li>No low stock items</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends 'stock/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Products</h5>
+                <p class="card-text display-6">{{ total_products }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total Customers</h5>
+                <p class="card-text display-6">{{ total_customers }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Active Loans</h5>
+                <p class="card-text display-6">{{ active_loans }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Low Stock Products</h4>
+<ul class="list-group">
+    {% for product in low_stock %}
+        <li class="list-group-item list-group-item-danger">{{ product.name }} — {{ product.quantity }} remaining</li>
+    {% empty %}
+        <li class="list-group-item list-group-item-success">No low stock items</li>
+    {% endfor %}
+</ul>
+{% endblock %}

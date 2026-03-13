@@ -1,13 +1,43 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <h1>Loan List</h1>
-    <ul>
+{% extends 'stock/base.html' %}
+
+{% block title %}Loans{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Loans</h1>
+    <a href="{% url 'create_loan' %}" class="btn btn-primary">New Loan</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Due Back</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for loan in loans %}
-            <li>{{ loan.product.name }} - {{ loan.customer.name }} - Status: {{ loan.status }} - Due Date: {{ loan.due_back_date }}</li>
+        <tr>
+            <td>{{ loan.product.name }}</td>
+            <td>{{ loan.customer.name }}</td>
+            <td>{{ loan.status }}</td>
+            <td>{{ loan.due_back_date|date:"d M Y" }}</td>
+            <td>
+                {% if loan.status != 'Returned' %}
+                    <a href="{% url 'return_loan' loan.pk %}" class="btn btn-sm btn-warning">Return</a>
+                {% else %}
+                    <span class="text-muted">—</span>
+                {% endif %}
+            </td>
+        </tr>
         {% empty %}
-            <li>No loans found</li>
+        <tr>
+            <td colspan="5" class="text-center text-muted">No loans found</td>
+        </tr>
         {% endfor %}
-    </ul>
-</body>
-</html>
+    </tbody>
+</table>
+{% endblock %}
