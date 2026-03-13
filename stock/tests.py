@@ -243,3 +243,21 @@ def test_loan_list_status_filter():
     assert response.status_code == 200
     assert len(response.context['loans']) == 1
     assert response.context['loans'][0].status == Loan.Status.RETURNED
+
+@pytest.mark.django_db
+def test_export_loans_excel():
+    # Arrange
+    user = User.objects.create_user(username='testuser', password='testpass')
+    customer = Customer.objects.create(name="Test User", phone="+447111111111", email="test@test.com")
+    product = Product.objects.create(name="Test Product", price=10.00, category="Other", quantity=5)
+    create_loan(customer, product, timezone.now() + timedelta(days=7))
+
+    # Act
+    client = Client()
+    client.force_login(user)
+    response = client.get(reverse('export_loans'))
+
+    # Assert
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    assert 'loans.xlsx' in response['Content-Disposition']

@@ -10,6 +10,8 @@
         <a href="?status=Out+on+Loan" class="btn btn-outline-warning btn-sm {% if status_filter == 'Out on Loan' %}active{% endif %}">Active</a>
         <a href="?status=Returned" class="btn btn-outline-success btn-sm {% if status_filter == 'Returned' %}active{% endif %}">Returned</a>
         <a href="{% url 'create_loan' %}" class="btn btn-primary btn-sm ms-3">New Loan</a>
+        <a href="{% url 'export_loans' %}" class="btn btn-success btn-sm ms-2">Export Excel</a>
+
     </div>
 </div>
 

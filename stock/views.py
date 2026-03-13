@@ -1,4 +1,6 @@
 
+import openpyxl
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Customer, Product, Loan
@@ -72,3 +74,30 @@ def return_loan_view(request, pk):
 
 
      return render(request, 'stock/return_loan.html', {'loan': loan})
+
+
+@login_required
+def export_loans_to_excel(request):
+    """Export all loans to an Excel file."""
+    loans = Loan.objects.select_related('customer', 'product').all()
+
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = 'Loans'
+
+    headers = ['ID', 'Customer', 'Product', 'Due Back Date', 'Status']
+    sheet.append(headers)
+
+    for loan in loans:
+        sheet.append([
+            loan.id,
+            loan.customer.name,
+            loan.product.name,
+            loan.due_back_date.strftime('%Y-%m-%d'),
+            loan.status
+        ])
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=loans.xlsx'
+    workbook.save(response)
+    return response
