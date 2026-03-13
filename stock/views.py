@@ -27,8 +27,14 @@ def dashboard(request):
 def loan_list(request):
     """Display all loans."""
     loans = Loan.objects.select_related('customer', 'product').all()
-    
-    context = {'loans': loans}
+
+    status_filter = request.GET.get('status')
+    if status_filter:
+        loans = loans.filter(status=status_filter)
+
+    context = {
+        'loans': loans,
+        'status_filter': status_filter}
     return render(request, 'stock/loan_list.html', context)
 
 @login_required

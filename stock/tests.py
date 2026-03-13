@@ -221,3 +221,25 @@ def test_loan_list_query_count():
     #Assert -- # 1 loan query + session/auth queries
     assert response.status_code == 200
     assert query_count <= 4
+
+
+@pytest.mark.django_db
+def test_loan_list_status_filter():
+    # Arrange
+    user = User.objects.create_user(username='testuser', password='testpass')
+    customer = Customer.objects.create(name="Test User", phone="+447111111111", email="test@test.com")
+    product = Product.objects.create(name="Test Product", price=10.00, category="Other", quantity=5)
+    due_back_date = timezone.now() + timedelta(days=7)
+    create_loan(customer, product, due_back_date)  # Out on Loan
+    loan2 = create_loan(customer, product, due_back_date)
+    return_loan(loan2)  # Returned
+
+    # Act
+    client = Client()
+    client.force_login(user)
+    response = client.get(reverse('loan_list') + '?status=Returned')
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response.context['loans']) == 1
+    assert response.context['loans'][0].status == Loan.Status.RETURNED
